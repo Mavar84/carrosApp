@@ -188,6 +188,7 @@
  
     function obtenerHeaders() {
       return {
+        'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + obtenerToken()
       };
     }
@@ -246,30 +247,25 @@
       btnCancelar.addEventListener('click', () => reiniciarFormulario(true));
     }
  
-    function obtenerFormDataActual() {
-      const formData = new FormData();
-      
-      formData.append('marca', document.getElementById('marca').value);
-      formData.append('modelo', document.getElementById('modelo').value);
-      formData.append('anio', document.getElementById('anio').value);
-      formData.append('paisOrigen', document.getElementById('paisOrigen').value);
-      formData.append('tipoCarroceria', document.getElementById('tipoCarroceria').value);
-      formData.append('motor', document.getElementById('motor').value);
-      formData.append('color', document.getElementById('color').value);
-      formData.append('estadoConservacion', document.getElementById('estadoConservacion').value);
-      formData.append('valorEstimado', document.getElementById('valorEstimado').value);
-      
-     
-        formData.append('imagen', "sin imagen"); 
-      
-
-      return formData;
+    function obtenerDatosAutoActual() {
+      return {
+        marca: document.getElementById('marca').value,
+        modelo: document.getElementById('modelo').value,
+        anio: document.getElementById('anio').value,
+        paisOrigen: document.getElementById('paisOrigen').value,
+        tipoCarroceria: document.getElementById('tipoCarroceria').value,
+        motor: document.getElementById('motor').value,
+        color: document.getElementById('color').value,
+        estadoConservacion: document.getElementById('estadoConservacion').value,
+        valorEstimado: document.getElementById('valorEstimado').value,
+        imagenUrl: 'sin imagen'
+      };
     }
  
     async function guardarAuto() {
       try {
         btnGuardar.disabled = true;
-        const formData = obtenerFormDataActual();
+        const auto = obtenerDatosAutoActual();
  
         let url = API_Autos;
         let metodo = 'POST';
@@ -281,8 +277,8 @@
  
         const respuesta = await fetch(url, {
           method: metodo,
-          headers: obtenerHeaders(), 
-          body: formData 
+          headers: obtenerHeaders(),
+          body: JSON.stringify(auto)
         });
  
         await procesarRespuesta(respuesta);

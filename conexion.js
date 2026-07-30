@@ -3,17 +3,32 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const uri = process.env.MONGO
+const uri = process.env.MONGO;
 
-
+let conexionPromise;
 
 async function conectarBD() {
-try {
-await mongoose.connect(uri);
-console.log('Conectado correctamente a MongoDB Atlas con Mongoose actualizado');
-} catch (error) {
-console.log('Error conectando con Mongoose:', error.message);
-}
+  if (!uri) {
+    throw new Error('La variable de entorno MONGO no esta configurada');
+  }
+
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (!conexionPromise) {
+    conexionPromise = mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+    });
+  }
+
+  try {
+    await conexionPromise;
+    return mongoose.connection;
+  } catch (error) {
+    conexionPromise = null;
+    throw error;
+  }
 }
 
 module.exports = conectarBD;
